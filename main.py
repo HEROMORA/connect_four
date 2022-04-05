@@ -1,11 +1,9 @@
-
 # Press the green button in the gutter to run the script.
 from models.node_type import NodeType
 from models.pruning import Pruning
 from models.state import State
 from minimaxAlgorithm import *
 from scoreCalculation import *
-
 
 if __name__ == '__main__':
     sample_seq = 'rrr0rrrbbb0bbb0000000000000000000000000000'
@@ -17,9 +15,8 @@ if __name__ == '__main__':
     seq = 'rrrbbbbrrrrbbrbrrrbbrrrrrbrrrbbbbbrrbbbbrr'
 
     print(node.sequence)
+    print(node.cost)
     print(cost)
     # print(getDiagonal(seq, 14))
     # print(getScore(seq, 'r'))
     # print(getScore(seq, 'b'))
-
-
