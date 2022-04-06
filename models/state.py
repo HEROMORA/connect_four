@@ -1,6 +1,8 @@
 from models.node_type import NodeType
 from models.pruning import Pruning
 from scoreCalculation import *
+from models.constants import *
+
 
 # We will use String for representing the board
 # R - Red Tile
@@ -13,14 +15,6 @@ from scoreCalculation import *
 #   5  6  7  8  9
 #   0  1  2  3  4
 
-# TODO: Check to move these constants to somewhere more global
-width = 7
-height = 6
-
-red = 'r'
-blue = 'b'
-empty = '0'
-
 
 class State:
 
@@ -29,26 +23,32 @@ class State:
         self.node_type = node_type
         self.pruning = pruning
         self.cost = -1
-        self.children = self.generate_children('r' if self.node_type == NodeType.max else 'b')
+        self.children = []
+        # self.children = self.generate_children(red if self.node_type == NodeType.max else blue)
 
         assert len(self.sequence) == width * height
 
-    # TODO: IMPLEMENT evaluation
-    def evaluate_state(self):
-        return getScore(self.sequence, 'r' if self.node_type == NodeType.max else 'b')
+    def evaluate_set_cost(self):
+        score = getScore(self.sequence, red if self.node_type == NodeType.max else blue)
+        self.cost = score
+        return score
 
-    # TODO: return a list of possible children to the state @yosra
-    def generate_children(self, color):
-        tempSequence = self.sequence
-        children = []
-        for i in range(7):
-            temp = self.sequence[i::7]
-            if '0' not in temp:
+    def generate_children(self):
+        color = red if self.node_type == NodeType.max else blue
+        current_sequence = self.sequence
+
+        for i in range(width):
+            childSequence = self.sequence[i::width]
+
+            if empty not in childSequence:
                 continue
-            index = temp.index('0') * 7 + i
-            temp = tempSequence[:index] + color + tempSequence[index+1:]
-            children.append(temp)
-        return children
+
+            index = childSequence.index(empty) * width + i
+            childSequence = current_sequence[:index] + color + current_sequence[index + 1:]
+
+            childNodeType = self.get_child_node_type()
+            childState = State(childSequence, childNodeType, Pruning(0, 0))
+            self.children.append(childState)
 
     def is_full_board(self):
         for i in range(width):
@@ -57,3 +57,9 @@ class State:
                 return False
 
         return True
+
+    def get_child_node_type(self):
+        if self.node_type == NodeType.max:
+            return NodeType.mini
+
+        return NodeType.max

@@ -1,64 +1,51 @@
 import numpy as np
 
 from models.state import State
-from models.node_type import NodeType
-from models.pruning import Pruning
-from scoreCalculation import *
+from models.constants import *
 
 
 # Chip Color
-# Red --> Model
-# Blue --> User
+# Red --> Model (MAXIMIZER)
+# Blue --> User (MINIMIZER)
 
 
-def maximize(boardState, k):  # boardState is state object, k is number of levels
-    if not k:
-        boardState.cost = boardState.evaluate_state()  # End of tree, get score using heuristics
-        return boardState, boardState.cost
-
-    if boardState.is_full_board():  # Full Board
-        boardState.cost = getScore(boardState, 'r')
-        return boardState, boardState.cost
+def maximize(board_state: State, k: int):  # boardState is state object, k is number of levels
+    if not k or board_state.is_full_board():
+        board_state.evaluate_set_cost()  # End of tree, get score using heuristics
+        return board_state
 
     maxChild = None
-    maxScore = -np.inf
-    for child in boardState.children:
-        childNode = State(child, NodeType.mini, Pruning(0, 0))
-        node, cost = minimize(childNode, k - 1)
-        childNode.cost = cost
+    board_state.generate_children()
+    for child in board_state.children:
+        min_child = minimize(child, k - 1)
 
-        if cost > maxScore:
-            maxChild, maxScore = childNode, cost
+        if maxChild is None or min_child.cost > maxChild.cost:
+            maxChild = min_child
 
-    return maxChild, maxScore
+    return maxChild
 
 
-def minimize(boardState, k):
-    if not k:
-        boardState.cost = boardState.evaluate_state()  # End of tree, get score using heuristics
-        return boardState, boardState.cost
-
-    if boardState.is_full_board():
-        boardState.cost = getScore(boardState, 'b')
-        return boardState, boardState.cost
+def minimize(board_state: State, k: int):
+    if not k or board_state.is_full_board():
+        board_state.evaluate_set_cost()  # End of tree, get score using heuristics
+        return board_state
 
     minChild = None
-    minScore = np.inf
-    for child in boardState.children:
-        childNode = State(child, NodeType.max, Pruning(0, 0))
-        node, cost = maximize(childNode, k - 1)
-        childNode.cost = cost
+    board_state.generate_children()
+    for child in board_state.children:
+        max_child = maximize(child, k - 1)
 
-        if cost < minScore:
-            minChild, minScore = childNode, cost
+        if minChild is None or max_child.cost < minChild.cost:
+            minChild = max_child
 
-    return minChild, minScore
+    return minChild
 
 
-def decide(boardState, k, prune, color):
+def decide(board_state: State, k: int, prune: bool, color: str):
+    node = None
     if not prune:
-        if color == 'r':
-            node, cost = maximize(boardState, k)
+        if color == red:
+            node = maximize(board_state, k)
         else:
-            node, cost = minimize(boardState, k)
-    return node, cost
+            node = minimize(board_state, k)
+    return node

@@ -10,13 +10,12 @@ if __name__ == '__main__':
     sample_state = State(sample_seq, NodeType.max, Pruning(0, 0))
 
     # print(sample_state.is_full_board())
-    node, cost = decide(sample_state, 2, False, 'r')
+    node = decide(sample_state, 2, False, red)
     test = '123456712345671234567123456712345671234567'
     seq = 'rrrbbbbrrrrbbrbrrrbbrrrrrbrrrbbbbbrrbbbbrr'
 
     print(node.sequence)
     print(node.cost)
-    print(cost)
     # print(getDiagonal(seq, 14))
     # print(getScore(seq, 'r'))
     # print(getScore(seq, 'b'))
