@@ -1,5 +1,6 @@
 from models.node_type import NodeType
 from models.pruning import Pruning
+from scoreCalculation import *
 
 # We will use String for representing the board
 # R - Red Tile
@@ -28,17 +29,26 @@ class State:
         self.node_type = node_type
         self.pruning = pruning
         self.cost = -1
-        self.children = self.generate_children()
+        self.children = self.generate_children('r' if self.node_type == NodeType.max else 'b')
 
         assert len(self.sequence) == width * height
 
     # TODO: IMPLEMENT evaluation
     def evaluate_state(self):
-        return self.cost + 93
+        return getScore(self.sequence, 'r' if self.node_type == NodeType.max else 'b')
 
     # TODO: return a list of possible children to the state @yosra
-    def generate_children(self):
-        return []
+    def generate_children(self, color):
+        tempSequence = self.sequence
+        children = []
+        for i in range(7):
+            temp = self.sequence[i::7]
+            if '0' not in temp:
+                continue
+            index = temp.index('0') * 7 + i
+            temp = tempSequence[:index] + color + tempSequence[index+1:]
+            children.append(temp)
+        return children
 
     def is_full_board(self):
         for i in range(width):
