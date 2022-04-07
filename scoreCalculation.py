@@ -1,55 +1,71 @@
-def getDiagonal(boardState, index, inverse):
-    value = index
-    if inverse:
-        remainder = 0
-        increment = 6
-    else:
-        remainder = 6
-        increment = 8
-    chunk = ''
-    while value < 42:
-        chunk += boardState[value]
-        if value % 7 == remainder:  # index reached the last column
-            break
-        value += increment
-    return chunk
+from models.constants import *
 
 
-def calculateScore(chunk, color):
-    score = 0
-    if len(chunk) > 3:
-        for i in range((len(chunk) % 4) + 1):  # range --> number of 4's in the given string
-            uniqueValues = list(set(chunk[i:i + 4]))  # get unique values in each 4 chars, 'bbbb' returns ['b']
-            if len(uniqueValues) == 1 and uniqueValues[0] == color:
-                score += 1
-    return score
+#   15 16 17 18 19
+#   10 11 12 13 14
+#   5  6  7  8  9
+#   0  1  2  3  4
+
+def is_unique_vector(vector: str, color: str):
+    unique_values = set(vector)
+    if len(unique_values) == 1 and unique_values.pop() == color:
+        return True
+
+    return False
 
 
-def getScore(boardState, color):  # boardState is String (sequence)
-    j = 0
-    score = 0
+def loop_tiles(sequence: str, count: int, color: str, evaluation_function):
+    total_score = 0
 
-    for i in range(6):  # get score of each row
-        row = boardState[j:j + 7]
-        j += 7
-        score += calculateScore(row, color)
+    # Counting horizontal counts
+    for i in range(height):
+        bias = i * width
+        for j in range(width - count):
+            index = bias + j
+            row = sequence[index: index + count]
+            total_score = evaluation_function(total_score, row, color)
 
-    for i in range(7):  # get score of each column
-        column = boardState[i::7]
-        score += calculateScore(column, color)
+    # Counting vertical counts
+    for i in range(height - count + 1):
+        for j in range(width):
+            start = (i * width) + j
+            end = start + (width * count)
+            column = sequence[start:end:width]
+            total_score = evaluation_function(total_score, column, color)
 
-    for i in range(7):  # get score of Diagonal and inverse diagonal starting from the bottom
-        diagonal = getDiagonal(boardState, i, False)
-        score += calculateScore(diagonal, color)
-        invDiagonal = getDiagonal(boardState, i, True)
-        score += calculateScore(invDiagonal, color)
+    # Counting forward diagonals
+    for i in range(height - count + 1):
+        for j in range(width - count + 1):
+            start = (i * width) + j
+            step = width + 1
+            end = start + (width * (count - 1)) + count
+            diagonal = sequence[start:end:step]
+            total_score = evaluation_function(total_score, diagonal, color)
 
-    for i in range(6):  # get score of Diagonal and inverse diagonal starting from the left
-        diagonal = getDiagonal(boardState, i + 7, False)
-        score += calculateScore(diagonal, color)
+    # Counting inverse diagonals
+    for i in range(height - count + 1):
+        for j in range(width - 1, count - 2, -1):
+            start = (i * width) + j
+            dec_step = width - 1
+            end = start + (dec_step * (count - 1)) + 1
+            inv_diagonal = sequence[start:end:dec_step]
+            total_score = evaluation_function(total_score, inv_diagonal, color)
 
-    for i in range(6, 41, 7):  # get score of Diagonal and inverse diagonal starting from the right
-        invDiagonal = getDiagonal(boardState, i, True)
-        score += calculateScore(invDiagonal, color)
+    return total_score
 
+
+def get_score(sequence: str, color: str):
+    # Other herustics to be added here
+    return count_fours(sequence, color) * 1
+
+
+# Count Evaluation Heruistics
+
+def count_fours(sequence: str, color: str):
+    return loop_tiles(sequence, 4, color, evaluate_count)
+
+
+def evaluate_count(score, vector, color):
+    if is_unique_vector(vector, color):
+        return score + 1
     return score

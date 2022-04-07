@@ -24,12 +24,11 @@ class State:
         self.pruning = pruning
         self.cost = -1
         self.children = []
-        # self.children = self.generate_children(red if self.node_type == NodeType.max else blue)
 
         assert len(self.sequence) == width * height
 
     def evaluate_set_cost(self):
-        score = getScore(self.sequence, red if self.node_type == NodeType.max else blue)
+        score = get_score(self.sequence, red if self.node_type == NodeType.max else blue)
         self.cost = score
         return score
 
