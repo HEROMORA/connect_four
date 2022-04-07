@@ -46,7 +46,7 @@ class State:
             childSequence = current_sequence[:index] + color + current_sequence[index + 1:]
 
             childNodeType = self.get_child_node_type()
-            childState = State(childSequence, childNodeType, Pruning(0, 0))
+            childState = State(childSequence, childNodeType, self.pruning)
             self.children.append(childState)
 
     def is_full_board(self):

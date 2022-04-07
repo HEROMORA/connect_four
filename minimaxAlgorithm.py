@@ -21,6 +21,11 @@ def maximize(board_state: State, k: int):  # boardState is state object, k is nu
 
         if maxChild is None or min_child.cost > maxChild.cost:
             maxChild = min_child
+            maxChild.pruning.alpha = max(maxChild.cost, maxChild.pruning.alpha) # Updating alpha
+
+        # Break on pruning
+        if maxChild.pruning.alpha > maxChild.pruning.beta:
+            return maxChild
 
     return maxChild
 
@@ -37,6 +42,11 @@ def minimize(board_state: State, k: int):
 
         if minChild is None or max_child.cost < minChild.cost:
             minChild = max_child
+            minChild.pruning.beta = min(minChild.cost, minChild.pruning.beta)  # Update beta
+
+        # Break on pruning
+        if minChild.pruning.alpha > minChild.pruning.beta:
+            return minChild
 
     return minChild
 
