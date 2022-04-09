@@ -90,7 +90,7 @@ def main(WithHeuristic: bool):
     while run:
         clock.tick(FPS)
         if(turn):
-            curr_state = State(filled_cells, NodeType.max, Pruning(-float('inf'), float('inf')))
+            curr_state = State(filled_cells, NodeType.max)
             returned_state = decide(curr_state, num_levels, WithHeuristic, 'r')
             filled_cells = returned_state.sequence
             if(returned_state.is_full_board()):

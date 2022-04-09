@@ -20,7 +20,7 @@ def loop_tiles(sequence: str, count: int, color: str, evaluation_function):
     # Counting horizontal counts
     for i in range(height):
         bias = i * width
-        for j in range(width - count):
+        for j in range(width - count + 1):
             index = bias + j
             row = sequence[index: index + count]
             total_score = evaluation_function(total_score, row, color)
