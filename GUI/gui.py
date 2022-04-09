@@ -19,8 +19,8 @@ def draw_window():
     pygame.draw.rect(WIN, RED, button_with_heuristic)
     pygame.draw.rect(WIN, BLUE, button_without_heuristic)
 
-    text_with_heuristic = START_FONT.render("Play With Heuristic", 1, WHITE)
-    text_without_heuristic = START_FONT.render("Play Without Heuristic", 1, WHITE)
+    text_with_heuristic = START_FONT.render("Play With Pruning", 1, WHITE)
+    text_without_heuristic = START_FONT.render("Play Without Pruning", 1, WHITE)
     WIN.blit(text_with_heuristic, (button_with_heuristic.x + button_with_heuristic.width/2 - text_with_heuristic.get_width()/2, button_with_heuristic.y + button_with_heuristic.height/2 - text_with_heuristic.get_height()/2))
     WIN.blit(text_without_heuristic, (button_without_heuristic.x + button_without_heuristic.width/2 - text_without_heuristic.get_width()/2, button_without_heuristic.y + button_without_heuristic.height/2 - text_without_heuristic.get_height()/2))
     pygame.display.update()

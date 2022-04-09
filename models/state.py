@@ -28,7 +28,8 @@ class State:
         assert len(self.sequence) == width * height
 
     def evaluate_set_cost(self):
-        score = get_score(self.sequence, red if self.node_type == NodeType.max else blue)
+        # score = get_score(self.sequence, red if self.node_type == NodeType.max else blue)
+        score = get_abs_score(self.sequence)
         self.cost = score
         return score
 
