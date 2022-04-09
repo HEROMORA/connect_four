@@ -70,18 +70,15 @@ def decide(board_state: State, k: int, prune: bool, color: str):
     tree = Tree()
     root = tree.create_node(board_state.cost, board_state.id)
     time1 = time.time()
-    if not prune:
-        if color == red:
-            node = maximize(board_state, k, tree)
-        else:
-            node = minimize(board_state, k, tree)
+
+    if color == red:
+        node = maximize(board_state, k, prune, tree)
+    else:
+        node = minimize(board_state, k, prune, tree)
+
+
     root.tag = node.cost
     totalTime = time.time() - time1
     tree.show()
     print(totalTime)
-
-    if color == red:
-        node = maximize(board_state, k, prune)
-    else:
-        node = minimize(board_state, k, prune)
     return node
