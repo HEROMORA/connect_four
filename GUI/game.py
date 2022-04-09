@@ -4,6 +4,7 @@ from models.node_type import NodeType
 from models.pruning import Pruning
 from minimaxAlgorithm import decide
 from models.state import State
+from scoreCalculation import count_fours
 
 import tkinter as tk
 from tkinter import simpledialog
@@ -25,9 +26,13 @@ for i in range(7):
     for j in range(6):
         current_state[i].append('0')
 
-def draw_window(current_column: int, current_player_color:tuple, sequence:str):
+def draw_window(current_column: int, current_player_color:tuple, sequence:str, isFull:bool):
     WIN.blit(BACKGROUND_IMAGE, (0, 0))
     text = CONNECT_FOUR_FONT.render("Connect Four", 1, BLACK)
+    red_four_count = count_fours(sequence, 'r')
+    blue_four_count = count_fours(sequence, 'b')
+    red_score = SCORE_FONT.render(f"AI agent: {red_four_count}", 1, BLACK)
+    blue_score = SCORE_FONT.render(f"You: {blue_four_count}", 1, BLACK)
     WIN.blit(text, (WIDTH/2 - text.get_width()/2, 20))
 
     for i in range(7):
@@ -48,6 +53,17 @@ def draw_window(current_column: int, current_player_color:tuple, sequence:str):
     if(current_column != -1):
         pygame.draw.circle(WIN, current_player_color, (cells[current_column][5].x + CELL_WIDTH/2, cell.y + CELL_HEIGHT/2), CELL_HEIGHT/2-10)
 
+    WIN.blit(red_score, (10, 10))
+    WIN.blit(blue_score, (WIDTH - blue_score.get_width() - 10, 10))
+    if isFull:
+        if(red_four_count > blue_four_count):
+            text = CONNECT_FOUR_FONT.render("AI agent wins!", 1, BLACK)
+        elif(red_four_count < blue_four_count):
+            text = CONNECT_FOUR_FONT.render("You win!", 1, BLACK)
+        else:
+            text = CONNECT_FOUR_FONT.render("Draw!", 1, BLACK)
+
+        WIN.blit(text, (WIDTH/2 - text.get_width()/2, HEIGHT/2 - text.get_height()/2))
     pygame.display.update()
 
 def handle_hover(mouse_pos):
@@ -70,11 +86,15 @@ def main(WithHeuristic: bool):
     clock = pygame.time.Clock()
     filled_cells = "0"*7*6
     turn = False
+    isFull = False
     while run:
         clock.tick(FPS)
         if(turn):
             curr_state = State(filled_cells, NodeType.max, Pruning(-float('inf'), float('inf')))
-            filled_cells = decide(curr_state, num_levels, WithHeuristic, 'r').sequence
+            returned_state = decide(curr_state, num_levels, WithHeuristic, 'r')
+            filled_cells = returned_state.sequence
+            if(returned_state.is_full_board()):
+                isFull = True
             turn = not turn
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -94,7 +114,7 @@ def main(WithHeuristic: bool):
 
         current_column = handle_hover(pygame.mouse.get_pos())
         color = RED if turn else BLUE
-        draw_window(current_column,color, filled_cells)
+        draw_window(current_column,color, filled_cells, isFull)
 
 if __name__ == "__main__":
     main()
