@@ -5,6 +5,12 @@ from models.pruning import Pruning
 from minimaxAlgorithm import decide
 from models.state import State
 
+import tkinter as tk
+from tkinter import simpledialog
+
+ROOT = tk.Tk()
+ROOT.withdraw()
+
 pygame.font.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -59,6 +65,7 @@ def handle_hover(mouse_pos):
 
 
 def main(WithHeuristic: bool):
+    num_levels = simpledialog.askinteger("Number of levels", "Enter the number of levels you want to traverse to:")
     run = True
     clock = pygame.time.Clock()
     filled_cells = "0"*7*6
@@ -67,7 +74,7 @@ def main(WithHeuristic: bool):
         clock.tick(FPS)
         if(turn):
             curr_state = State(filled_cells, NodeType.max, Pruning(-float('inf'), float('inf')))
-            filled_cells = decide(curr_state, 3, WithHeuristic, 'r').sequence
+            filled_cells = decide(curr_state, num_levels, WithHeuristic, 'r').sequence
             turn = not turn
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
