@@ -2,7 +2,7 @@ from models.node_type import NodeType
 from models.pruning import Pruning
 from scoreCalculation import *
 from models.constants import *
-
+from uuid import uuid4
 
 # We will use String for representing the board
 # R - Red Tile
@@ -19,6 +19,7 @@ from models.constants import *
 class State:
 
     def __init__(self, sequence: str, node_type: NodeType, pruning: Pruning):
+        self.id = uuid4()
         self.sequence = sequence
         self.node_type = node_type
         self.pruning = pruning

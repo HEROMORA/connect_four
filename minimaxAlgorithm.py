@@ -2,14 +2,15 @@ import numpy as np
 
 from models.state import State
 from models.constants import *
-
+from treelib import Tree
+import time
 
 # Chip Color
 # Red --> Model (MAXIMIZER)
 # Blue --> User (MINIMIZER)
 
 
-def maximize(board_state: State, k: int, prune: bool):  # boardState is state object, k is number of levels
+def maximize(board_state: State, k: int, prune: bool, tree):  # boardState is state object, k is number of levels
     if not k or board_state.is_full_board():
         board_state.evaluate_set_cost()  # End of tree, get score using heuristics
         return board_state
@@ -17,8 +18,11 @@ def maximize(board_state: State, k: int, prune: bool):  # boardState is state ob
     maxChild = None
     board_state.generate_children()
     for child in board_state.children:
-        min_child = minimize(child, k - 1, prune)
+        
+        n = tree.create_node(child.cost, child.id, parent=board_state.id)
+        min_child = minimize(child, k - 1, prune, tree)
 
+        n.tag = min_child.cost
         if maxChild is None or min_child.cost > maxChild.cost:
             maxChild = child
             maxChild.cost = min_child.cost
@@ -32,16 +36,20 @@ def maximize(board_state: State, k: int, prune: bool):  # boardState is state ob
     return maxChild
 
 
-def minimize(board_state: State, k: int, prune: bool):
+def minimize(board_state: State, k: int, prune: bool, tree):
     if not k or board_state.is_full_board():
         board_state.evaluate_set_cost()  # End of tree, get score using heuristics
         return board_state
 
     minChild = None
     board_state.generate_children()
-    for child in board_state.children:
-        max_child = maximize(child, k - 1, prune)
 
+    for child in board_state.children:
+
+        n = tree.create_node(child.cost, child.id, parent=board_state.id)
+        max_child = maximize(child, k - 1, prune, tree)
+        
+        n.tag = max_child.cost
         if minChild is None or max_child.cost < minChild.cost:
             minChild = child
             minChild.cost = max_child.cost
@@ -56,9 +64,18 @@ def minimize(board_state: State, k: int, prune: bool):
 
 def decide(board_state: State, k: int, prune: bool, color: str):
     node = None
-    # TODO: USE OR NON USE PRUNING
+    tree = Tree()
+    root = tree.create_node(board_state.cost, board_state.id)
+    time1 = time.time()
+
     if color == red:
-        node = maximize(board_state, k, prune)
+        node = maximize(board_state, k, prune, tree)
     else:
-        node = minimize(board_state, k, prune)
+        node = minimize(board_state, k, prune, tree)
+
+
+    root.tag = node.cost
+    totalTime = time.time() - time1
+    tree.show()
+    print(totalTime)
     return node

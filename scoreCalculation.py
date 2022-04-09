@@ -54,12 +54,19 @@ def loop_tiles(sequence: str, count: int, color: str, evaluation_function):
     return total_score
 
 
+def get_opponent_color(color):
+    if color == red:
+        return blue
+    else:
+        return red
+        
 def get_abs_score(sequence: str):
     return get_score(sequence, red) - get_score(sequence, blue)
 
 
 def get_score(sequence: str, color: str):
     # Other herustics to be added here
+    # return count_fours(sequence, color) * 1 - count_fours(sequence, get_opponent_color(color)) * 1
     fours = count_fours(sequence, color) * 50
 
     # fours = 0
