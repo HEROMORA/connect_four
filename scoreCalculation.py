@@ -54,13 +54,46 @@ def loop_tiles(sequence: str, count: int, color: str, evaluation_function):
     return total_score
 
 
+def get_abs_score(sequence: str):
+    return get_score(sequence, red) - get_score(sequence, blue)
+
+
 def get_score(sequence: str, color: str):
     # Other herustics to be added here
-    return count_fours(sequence, color) * 1
+    fours = count_fours(sequence, color) * 50
+
+    # fours = 0
+    possibleSixs = count_possibles_combs(sequence, 6, color) * 20
+    possibleFours = count_possibles_combs(sequence, 4, color) * 6
+    possibleThrees = count_possibles_combs(sequence, 3, color) * 3
+    possibleTwos = count_possibles_combs(sequence, 2, color) * 2
+    score = possibleTwos + possibleThrees + possibleFours + possibleSixs + fours
+
+    return score
+
+
+# Count possible combinations
+
+
+def count_possibles_combs(sequence: str, count: int, color: str):
+    return loop_tiles(sequence, count, color, evaluate_possible_combination)
+
+
+# TODO : Keep in mind increasing diagonals
+# TODO: middles are weaker
+def evaluate_possible_combination(score, vector, color):
+    emptyDigits = 0
+    for x in vector:
+        if (x is not color and x is not empty) or emptyDigits > 1:
+            return 0
+
+        if x is empty:
+            emptyDigits += 1
+
+    return score + emptyDigits
 
 
 # Count Evaluation Heruistics
-
 def count_fours(sequence: str, color: str):
     return loop_tiles(sequence, 4, color, evaluate_count)
 
