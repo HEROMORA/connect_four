@@ -67,7 +67,7 @@ def main(WithHeuristic: bool):
         clock.tick(FPS)
         if(turn):
             curr_state = State(filled_cells, NodeType.max, Pruning(-float('inf'), float('inf')))
-            filled_cells = decide(curr_state, 2, WithHeuristic, 'r').sequence
+            filled_cells = decide(curr_state, 3, WithHeuristic, 'r').sequence
             turn = not turn
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
