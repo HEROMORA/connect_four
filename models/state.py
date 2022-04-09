@@ -18,20 +18,18 @@ from uuid import uuid4
 
 class State:
 
-    def __init__(self, sequence: str, node_type: NodeType, pruning: Pruning):
+    def __init__(self, sequence: str, node_type: NodeType):
         self.id = uuid4()
         self.sequence = sequence
         self.node_type = node_type
-        self.pruning = pruning
-        self.cost = -1
+        # self.pruning = pruning
+        # self.cost = -1
         self.children = []
 
         assert len(self.sequence) == width * height
 
     def evaluate_set_cost(self):
-        # score = get_score(self.sequence, red if self.node_type == NodeType.max else blue)
         score = get_abs_score(self.sequence)
-        self.cost = score
         return score
 
     def generate_children(self):
@@ -48,7 +46,7 @@ class State:
             childSequence = current_sequence[:index] + color + current_sequence[index + 1:]
 
             childNodeType = self.get_child_node_type()
-            childState = State(childSequence, childNodeType, self.pruning)
+            childState = State(childSequence, childNodeType)
             self.children.append(childState)
 
     def is_full_board(self):
