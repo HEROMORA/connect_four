@@ -1,3 +1,4 @@
+from unicodedata import name
 import pygame
 from GUI.gui_constants import *
 from GUI.game import main as game_main
